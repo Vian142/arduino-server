@@ -1,33 +1,45 @@
 var express = require('express');
 var fs = require('fs');
 var bodyParser = require('body-parser')
+var exphbs = require('express-handlebars');
+var moment = require('moment');
 
 var app = express();
 var PORT = 4444;
 
+var nowDate = moment();
+nowDate.localeData('ru');
+nowDate.format('DD MMMM YYYY, h:mm:ss');
 
+app.use('/views', express.static('views'));
 ///////////////////////////////////////////////////////////
-
-// parse application/x-www-form-urlencoded 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.engine('.hbs', exphbs({extname: '.hbs'}));
+app.set('view engine', '.hbs');
+///////////////////////////////////////////////////////////
  
 // parse application/json 
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
+
+
+//// Запрос главной страницы
 ///////////////////////////////////////////////////////////
 app.get('/', function(req, res) {
-    console.log('Запрос на главную страницу');
-    let fileContent = fs.readFileSync('data.txt', 'utf8');
+    var fileContent = fs.readFileSync('data.txt', 'utf8');
     fileContent = JSON.parse(fileContent);
-    
-    res.sendStatus(200);
+    console.log('Запрос Главной Страницы');
+    res.render('index', {title: 'Главная', listLog: fileContent});
 });
 
+
+//// Обработка запроса
 ///////////////////////////////////////////////////////////
 app.post('/add', function(req, res) {
-    let nowDate = new Date();
-    let inputContent = req.body;
-    inputContent['date'] = nowDate;
-    let fileContent = fs.readFileSync('data.txt', 'utf8');
+    var inputContent = req.body;
+    var date = nowDate.format('DD MMMM YYYY, h:mm:ss');
+    date = date.toString();
+    inputContent['date'] = date;
+    var fileContent = fs.readFileSync('data.txt', 'utf8');
     fileContent = JSON.parse(fileContent);
     fileContent.push(inputContent);
     fs.writeFileSync('data.txt', JSON.stringify(fileContent));
@@ -39,7 +51,7 @@ app.post('/add', function(req, res) {
 ///////////////////////////////////////////////////////////
 app.listen(PORT, function(err) {
     if(err) {
-        console.log('Ошибка');
+        console.log('Ошибка запуска сервера');
     }
     console.log('Сервер запущен на ' + 'localhost:' + PORT)
 })

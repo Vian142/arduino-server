@@ -1,1 +1,1 @@
-[]
+[{"arduino":{"Ultrasonic":179,"Light":"yes","sound":116,"Gas":420,"Water":"no"}},{"arduino":{"Ultrasonic":179,"Light":"yes","sound":116,"Gas":420,"Water":"no"},"date":"24 May 2017, 10:14:13"}]
